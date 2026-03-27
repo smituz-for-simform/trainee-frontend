@@ -1,70 +1,182 @@
-# Getting Started with Create React App
+# 📱 PhoneBook Application (Frontend)
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This is the **ReactJS frontend** for the PhoneBook CRUD application.
+It connects to a Go backend API to manage contacts.
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+# 🚀 Prerequisites
 
-### `npm start`
+Make sure you have the following installed:
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+* Node.js (latest recommended)
+* npm or yarn
+* Backend service running (see below)
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+---
 
-### `npm test`
+# 🔗 Backend Setup (Required First)
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Clone and run the backend repository:
 
-### `npm run build`
+```bash
+git clone https://github.com/smituz-for-simform/trainee_backend.git
+cd trainee_backend
+go run main.go
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Backend will run on:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+```text
+http://localhost:8080
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### ⚙️ Important
 
-### `npm run eject`
+Make sure backend has CORS enabled:
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+```go
+r.Use(cors.Default())
+```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+---
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+# 📦 Frontend Setup
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+Clone this repository:
 
-## Learn More
+```bash
+git clone https://github.com/smituz-for-simform/trainee_frontend.git
+cd trainee_frontend
+```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Install dependencies:
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+```bash
+npm install
+```
 
-### Code Splitting
+Start the React app:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+```bash
+npm start
+```
 
-### Analyzing the Bundle Size
+Frontend will run on:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+```text
+http://localhost:3000
+```
 
-### Making a Progressive Web App
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+# 🌐 Application Routes
 
-### Advanced Configuration
+## 🏠 Home Page
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+```text
+http://localhost:3000/
+```
 
-### Deployment
+### Features:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+* Displays all contacts (GET API)
+* Delete contact (DELETE API with confirmation)
+* Navigation buttons:
 
-### `npm run build` fails to minify
+  * Add Contact
+  * Update Contact
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+---
+
+## ➕ Add Contact Page
+
+```text
+http://localhost:3000/add_contact
+```
+
+### Features:
+
+* Form to add new contact
+* Validates input via backend
+* On success → redirects to Home page
+
+---
+
+## ✏️ Update Contact Page
+
+```text
+http://localhost:3000/update_contact
+```
+
+### Features:
+
+* Lists all contacts
+* Inline editing using ✏️ button
+* Save updated contact
+* On success → redirects to Home page
+
+---
+
+# 🔌 API Endpoints Used
+
+| Method | Endpoint           | Description             |
+| ------ | ------------------ | ----------------------- |
+| GET    | `/get_contacts`    | Fetch all contacts      |
+| POST   | `/add_contact`     | Create new contact      |
+| PUT    | `/update_contact`  | Update existing contact |
+| DELETE | `/del_contact/:id` | Delete contact          |
+
+---
+
+# ⚠️ Common Issues
+
+### ❌ Network Error / Failed to fetch
+
+* Ensure backend is running on port `8080`
+* Ensure correct API base URL in frontend:
+
+```js
+const API = "http://localhost:8080";
+```
+
+---
+
+### ❌ CORS Errors
+
+Fix by enabling CORS in backend:
+
+```go
+import "github.com/gin-contrib/cors"
+
+r.Use(cors.Default())
+```
+
+---
+
+### ❌ JSON Parse Errors
+
+* Do not open API routes via frontend port (`3000`)
+* Always call backend via `8080`
+
+---
+
+# 📌 Notes
+
+* This project is built for learning **Full Stack + DevOps fundamentals**
+* Backend and frontend are intentionally simple for Docker/K8s deployment practice
+
+---
+
+# 🚀 Future Improvements
+
+* Add frontend validation
+* Replace alerts with notifications
+* Improve UI with Tailwind or component libraries
+* Add authentication layer
+
+---
+
+# 👨‍💻 Author
+
+Developed as part of DevOps training.
