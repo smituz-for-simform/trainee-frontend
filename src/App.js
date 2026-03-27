@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from "react";
+import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from "react-router-dom";
 
 const API = "http://localhost:8080";
 
-export default function App() {
+// 🔹 HOME PAGE
+function Home() {
   const [contacts, setContacts] = useState([]);
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [editingId, setEditingId] = useState(null);
 
-  // 🔹 GET contacts
   const fetchContacts = async () => {
     const res = await fetch(`${API}/get_contacts`);
     const data = await res.json();
@@ -19,41 +17,8 @@ export default function App() {
     fetchContacts();
   }, []);
 
-  // 🔹 POST contact
-  const createContact = async () => {
-    const res = await fetch(`${API}/add_contact`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, phone }),
-    });
-
-    const data = await res.json();
-    alert(data.message || data.error);
-    setName("");
-    setPhone("");
-    fetchContacts();
-  };
-
-  // 🔹 PUT contact
-  const updateContact = async (id) => {
-    const res = await fetch(`${API}/update_contact`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id, name, phone }),
-    });
-
-    const data = await res.json();
-    alert(data.message || data.error);
-    setEditingId(null);
-    setName("");
-    setPhone("");
-    fetchContacts();
-  };
-
-  // 🔹 DELETE contact
   const deleteContact = async (id) => {
-    const confirmDelete = window.confirm("Are you sure you want to delete?");
-    if (!confirmDelete) return;
+    if (!window.confirm("Are you sure you want to delete this contact?")) return;
 
     const res = await fetch(`${API}/del_contact/${id}`, {
       method: "DELETE",
@@ -65,88 +30,164 @@ export default function App() {
   };
 
   return (
-    <div className="p-6 max-w-3xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">📱 Phonebook</h1>
+    <div>
+      <h1>📱 PhoneBook</h1>
 
-      {/* 🔹 Create Contact */}
-      <div className="mb-6 border p-4 rounded-2xl shadow">
-        <h2 className="text-lg font-semibold mb-2">Create Contact</h2>
-        <input
-          className="border p-2 mr-2"
-          placeholder="Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-        <input
-          className="border p-2 mr-2"
-          placeholder="Phone"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-        />
-        <button
-          onClick={createContact}
-          className="bg-blue-500 text-white px-3 py-2 rounded"
-        >
-          Add
-        </button>
+      <div style={{ marginBottom: "20px" }}>
+        <Link to="/add_contact">
+          <button>Add a Contact</button>
+        </Link>
+
+        <Link to="/update_contact" style={{ marginLeft: "10px" }}>
+          <button>Update a Contact</button>
+        </Link>
       </div>
 
-      {/* 🔹 Contact List (GET) */}
-      <div className="border p-4 rounded-2xl shadow">
-        <h2 className="text-lg font-semibold mb-2">All Contacts</h2>
+      <h3>All Contacts</h3>
 
-        {contacts.map((c) => (
-          <div
-            key={c.id}
-            className="flex items-center justify-between border-b py-2"
+      {contacts.map((c) => (
+        <div key={c.id} style={{ marginBottom: "10px" }}>
+          {c.name} - {c.phone}
+          <button
+            style={{ marginLeft: "10px" }}
+            onClick={() => deleteContact(c.id)}
           >
-            {editingId === c.id ? (
-              <>
-                <input
-                  className="border p-1 mr-2"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                />
-                <input
-                  className="border p-1 mr-2"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                />
-                <button
-                  onClick={() => updateContact(c.id)}
-                  className="text-green-600 mr-2"
-                >
-                  ✔
-                </button>
-              </>
-            ) : (
-              <>
-                <span>
-                  {c.name} - {c.phone}
-                </span>
-                <div>
-                  <button
-                    onClick={() => {
-                      setEditingId(c.id);
-                      setName(c.name);
-                      setPhone(c.phone);
-                    }}
-                    className="mr-2 text-blue-600"
-                  >
-                    ✏️
-                  </button>
-                  <button
-                    onClick={() => deleteContact(c.id)}
-                    className="text-red-600"
-                  >
-                    🗑️
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
-        ))}
+            🗑️
+          </button>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// 🔹 ADD CONTACT PAGE
+function AddContact() {
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const navigate = useNavigate();
+
+  const createContact = async () => {
+    const res = await fetch(`${API}/add_contact`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, phone }),
+    });
+
+    const data = await res.json();
+    alert(data.message || data.error);
+
+    if (res.ok) navigate("/");
+  };
+
+  return (
+    <div>
+      <h2>Add Contact</h2>
+
+      <input
+        placeholder="Name"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+      />
+
+      <input
+        placeholder="Phone"
+        value={phone}
+        onChange={(e) => setPhone(e.target.value)}
+      />
+
+      <div>
+        <button onClick={createContact}>Save</button>
+        <button onClick={() => navigate("/")}>Cancel</button>
       </div>
     </div>
+  );
+}
+
+// 🔹 UPDATE CONTACT PAGE (INLINE EDIT)
+function UpdateContact() {
+  const [contacts, setContacts] = useState([]);
+  const [editingId, setEditingId] = useState(null);
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const navigate = useNavigate();
+
+  const fetchContacts = async () => {
+    const res = await fetch(`${API}/get_contacts`);
+    const data = await res.json();
+    setContacts(data);
+  };
+
+  useEffect(() => {
+    fetchContacts();
+  }, []);
+
+  const startEdit = (c) => {
+    setEditingId(c.id);
+    setName(c.name);
+    setPhone(c.phone);
+  };
+
+  const updateContact = async (id) => {
+    const res = await fetch(`${API}/update_contact`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, name, phone }),
+    });
+
+    const data = await res.json();
+    alert(data.message || data.error);
+
+    if (res.ok) {
+      setEditingId(null);
+      navigate("/");
+    }
+  };
+
+  return (
+    <div>
+      <h2>Update Contacts</h2>
+      <button onClick={() => navigate("/")}>⬅ Back</button>
+
+      {contacts.map((c) => (
+        <div key={c.id} style={{ marginBottom: "10px" }}>
+          {editingId === c.id ? (
+            <>
+              <input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+              <input
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+              />
+              <button onClick={() => updateContact(c.id)}>✔ Save</button>
+            </>
+          ) : (
+            <>
+              {c.name} - {c.phone}
+              <button
+                style={{ marginLeft: "10px" }}
+                onClick={() => startEdit(c)}
+              >
+                ✏️
+              </button>
+            </>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// 🔹 MAIN APP
+export default function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/add_contact" element={<AddContact />} />
+        <Route path="/update_contact" element={<UpdateContact />} />
+      </Routes>
+    </Router>
   );
 }
