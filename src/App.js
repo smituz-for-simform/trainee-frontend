@@ -3,6 +3,31 @@ import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from "react
 
 const API = "http://localhost:8080";
 
+// 🔹 COMMON STYLES
+const containerStyle = {
+  maxWidth: "700px",
+  margin: "40px auto",
+  padding: "20px",
+  background: "#ffffff",
+  borderRadius: "12px",
+  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+};
+
+const buttonStyle = {
+  padding: "8px 12px",
+  borderRadius: "8px",
+  border: "none",
+  cursor: "pointer",
+  marginRight: "10px",
+};
+
+const inputStyle = {
+  padding: "8px",
+  marginRight: "10px",
+  borderRadius: "6px",
+  border: "1px solid #ccc",
+};
+
 // 🔹 HOME PAGE
 function Home() {
   const [contacts, setContacts] = useState([]);
@@ -30,29 +55,29 @@ function Home() {
   };
 
   return (
-    <div>
-      <h1>📱 PhoneBook</h1>
+    <div style={containerStyle}>
+      <h1 style={{ textAlign: "center" }}>📱 PhoneBook</h1>
 
-      <div style={{ marginBottom: "20px" }}>
+      <div style={{ marginBottom: "20px", textAlign: "center" }}>
         <Link to="/add_contact">
-          <button>Add a Contact</button>
+          <button style={{ ...buttonStyle, background: "#4CAF50", color: "white" }}>Add Contact</button>
         </Link>
 
-        <Link to="/update_contact" style={{ marginLeft: "10px" }}>
-          <button>Update a Contact</button>
+        <Link to="/update_contact">
+          <button style={{ ...buttonStyle, background: "#2196F3", color: "white" }}>Update Contact</button>
         </Link>
       </div>
 
       <h3>All Contacts</h3>
 
       {contacts.map((c) => (
-        <div key={c.id} style={{ marginBottom: "10px" }}>
-          {c.name} - {c.phone}
+        <div key={c.id} style={{ display: "flex", justifyContent: "space-between", padding: "10px", borderBottom: "1px solid #eee" }}>
+          <span>{c.name} - {c.phone}</span>
           <button
-            style={{ marginLeft: "10px" }}
+            style={{ ...buttonStyle, background: "#f44336", color: "white" }}
             onClick={() => deleteContact(c.id)}
           >
-            🗑️
+            Delete
           </button>
         </div>
       ))}
@@ -80,30 +105,21 @@ function AddContact() {
   };
 
   return (
-    <div>
+    <div style={containerStyle}>
       <h2>Add Contact</h2>
 
-      <input
-        placeholder="Name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-      />
-
-      <input
-        placeholder="Phone"
-        value={phone}
-        onChange={(e) => setPhone(e.target.value)}
-      />
-
-      <div>
-        <button onClick={createContact}>Save</button>
-        <button onClick={() => navigate("/")}>Cancel</button>
+      <div style={{ marginBottom: "15px" }}>
+        <input style={inputStyle} placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} />
+        <input style={inputStyle} placeholder="Phone" value={phone} onChange={(e) => setPhone(e.target.value)} />
       </div>
+
+      <button style={{ ...buttonStyle, background: "#4CAF50", color: "white" }} onClick={createContact}>Save</button>
+      <button style={{ ...buttonStyle, background: "#ccc" }} onClick={() => navigate("/")}>Cancel</button>
     </div>
   );
 }
 
-// 🔹 UPDATE CONTACT PAGE (INLINE EDIT)
+// 🔹 UPDATE CONTACT PAGE
 function UpdateContact() {
   const [contacts, setContacts] = useState([]);
   const [editingId, setEditingId] = useState(null);
@@ -144,33 +160,24 @@ function UpdateContact() {
   };
 
   return (
-    <div>
+    <div style={containerStyle}>
       <h2>Update Contacts</h2>
-      <button onClick={() => navigate("/")}>⬅ Back</button>
+      <button style={{ ...buttonStyle, background: "#ccc" }} onClick={() => navigate("/")}>Back</button>
 
       {contacts.map((c) => (
-        <div key={c.id} style={{ marginBottom: "10px" }}>
+        <div key={c.id} style={{ display: "flex", justifyContent: "space-between", padding: "10px", borderBottom: "1px solid #eee" }}>
           {editingId === c.id ? (
             <>
-              <input
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-              <input
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-              />
-              <button onClick={() => updateContact(c.id)}>✔ Save</button>
+              <div>
+                <input style={inputStyle} value={name} onChange={(e) => setName(e.target.value)} />
+                <input style={inputStyle} value={phone} onChange={(e) => setPhone(e.target.value)} />
+              </div>
+              <button style={{ ...buttonStyle, background: "#4CAF50", color: "white" }} onClick={() => updateContact(c.id)}>Save</button>
             </>
           ) : (
             <>
-              {c.name} - {c.phone}
-              <button
-                style={{ marginLeft: "10px" }}
-                onClick={() => startEdit(c)}
-              >
-                ✏️
-              </button>
+              <span>{c.name} - {c.phone}</span>
+              <button style={{ ...buttonStyle, background: "#2196F3", color: "white" }} onClick={() => startEdit(c)}>Edit</button>
             </>
           )}
         </div>
