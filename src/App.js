@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from "react
 
 const API = "http://localhost:8080";
 
-// 🔹 COMMON STYLES
+// 🔹 STYLES
 const containerStyle = {
   maxWidth: "700px",
   margin: "40px auto",
@@ -43,7 +43,7 @@ function Home() {
   }, []);
 
   const deleteContact = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this contact?")) return;
+    if (!window.confirm("Delete this contact?")) return;
 
     const res = await fetch(`${API}/del_contact/${id}`, {
       method: "DELETE",
@@ -71,8 +71,18 @@ function Home() {
       <h3>All Contacts</h3>
 
       {contacts.map((c) => (
-        <div key={c.id} style={{ display: "flex", justifyContent: "space-between", padding: "10px", borderBottom: "1px solid #eee" }}>
-          <span>{c.name} - {c.phone}</span>
+        <div key={c.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px", borderBottom: "1px solid #eee" }}>
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <img
+              src={c.image_url ? `${API}${c.image_url}` : `${API}/uploads/default.jpeg`}
+              alt="profile"
+              width="40"
+              height="40"
+              style={{ borderRadius: "50%", marginRight: "10px" }}
+            />
+            <span>{c.name} - {c.phone}</span>
+          </div>
+
           <button
             style={{ ...buttonStyle, background: "#f44336", color: "white" }}
             onClick={() => deleteContact(c.id)}
@@ -85,17 +95,22 @@ function Home() {
   );
 }
 
-// 🔹 ADD CONTACT PAGE
+// 🔹 ADD CONTACT
 function AddContact() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [image, setImage] = useState(null);
   const navigate = useNavigate();
 
   const createContact = async () => {
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("phone", phone);
+    if (image) formData.append("image", image);
+
     const res = await fetch(`${API}/add_contact`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, phone }),
+      body: formData,
     });
 
     const data = await res.json();
@@ -108,23 +123,25 @@ function AddContact() {
     <div style={containerStyle}>
       <h2>Add Contact</h2>
 
-      <div style={{ marginBottom: "15px" }}>
-        <input style={inputStyle} placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} />
-        <input style={inputStyle} placeholder="Phone" value={phone} onChange={(e) => setPhone(e.target.value)} />
-      </div>
+      <input style={inputStyle} placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} />
+      <input style={inputStyle} placeholder="Phone" value={phone} onChange={(e) => setPhone(e.target.value)} />
+      <input type="file" onChange={(e) => setImage(e.target.files[0])} />
 
-      <button style={{ ...buttonStyle, background: "#4CAF50", color: "white" }} onClick={createContact}>Save</button>
-      <button style={{ ...buttonStyle, background: "#ccc" }} onClick={() => navigate("/")}>Cancel</button>
+      <div style={{ marginTop: "10px" }}>
+        <button style={{ ...buttonStyle, background: "#4CAF50", color: "white" }} onClick={createContact}>Save</button>
+        <button style={{ ...buttonStyle, background: "#ccc" }} onClick={() => navigate("/")}>Cancel</button>
+      </div>
     </div>
   );
 }
 
-// 🔹 UPDATE CONTACT PAGE
+// 🔹 UPDATE CONTACT
 function UpdateContact() {
   const [contacts, setContacts] = useState([]);
   const [editingId, setEditingId] = useState(null);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [image, setImage] = useState(null);
   const navigate = useNavigate();
 
   const fetchContacts = async () => {
@@ -144,19 +161,21 @@ function UpdateContact() {
   };
 
   const updateContact = async (id) => {
+    const formData = new FormData();
+    formData.append("id", id);
+    formData.append("name", name);
+    formData.append("phone", phone);
+    if (image) formData.append("image", image);
+
     const res = await fetch(`${API}/update_contact`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id, name, phone }),
+      body: formData,
     });
 
     const data = await res.json();
     alert(data.message || data.error);
 
-    if (res.ok) {
-      setEditingId(null);
-      navigate("/");
-    }
+    if (res.ok) navigate("/");
   };
 
   return (
@@ -165,18 +184,30 @@ function UpdateContact() {
       <button style={{ ...buttonStyle, background: "#ccc" }} onClick={() => navigate("/")}>Back</button>
 
       {contacts.map((c) => (
-        <div key={c.id} style={{ display: "flex", justifyContent: "space-between", padding: "10px", borderBottom: "1px solid #eee" }}>
+        <div key={c.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px", borderBottom: "1px solid #eee" }}>
+
           {editingId === c.id ? (
             <>
               <div>
                 <input style={inputStyle} value={name} onChange={(e) => setName(e.target.value)} />
                 <input style={inputStyle} value={phone} onChange={(e) => setPhone(e.target.value)} />
+                <input type="file" onChange={(e) => setImage(e.target.files[0])} />
               </div>
               <button style={{ ...buttonStyle, background: "#4CAF50", color: "white" }} onClick={() => updateContact(c.id)}>Save</button>
             </>
           ) : (
             <>
-              <span>{c.name} - {c.phone}</span>
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  <img
+                    src={c.image_url ? `${API}${c.image_url}` : `${API}/uploads/default.jpeg`}
+                    alt={c.name}
+                    width="40"
+                    height="40"
+                    style={{ borderRadius: "50%", marginRight: "10px", objectFit: "cover" }}
+                  />
+                  <span>{c.name} - {c.phone}</span>
+                </div>
+
               <button style={{ ...buttonStyle, background: "#2196F3", color: "white" }} onClick={() => startEdit(c)}>Edit</button>
             </>
           )}
@@ -186,7 +217,7 @@ function UpdateContact() {
   );
 }
 
-// 🔹 MAIN APP
+// 🔹 MAIN
 export default function App() {
   return (
     <Router>
