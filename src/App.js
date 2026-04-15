@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from "react-router-dom";
 
-const API = "http://localhost:8080";
+//const API = "http://localhost:8080";
+
+const API = process.env.REACT_APP_API;
 
 // 🔹 STYLES
 const containerStyle = {
@@ -56,7 +58,7 @@ function Home() {
 
   return (
     <div style={containerStyle}>
-      <h1 style={{ textAlign: "center" }}>📱 PhoneBook</h1>
+      <h1 style={{ textAlign: "center" }}>📱 Smituz ni PhoneBook</h1>
 
       <div style={{ marginBottom: "20px", textAlign: "center" }}>
         <Link to="/add_contact">
