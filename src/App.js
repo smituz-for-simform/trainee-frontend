@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from "react
 //const API = "http://localhost:8080";
 
 const API = process.env.REACT_APP_API;
+const DEFAULT_IMAGE_URL = process.env.REACT_APP_DEFAULT_IMAGE_URL;
 
 // 🔹 STYLES
 const containerStyle = {
@@ -76,7 +77,7 @@ function Home() {
         <div key={c.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px", borderBottom: "1px solid #eee" }}>
           <div style={{ display: "flex", alignItems: "center" }}>
             <img
-              src={c.image_url ? `${API}${c.image_url}` : `${API}/uploads/default.jpeg`}
+              src={c.image_url ? `${c.image_url}` : `${DEFAULT_IMAGE_URL}`}
               alt="profile"
               width="40"
               height="40"
@@ -201,7 +202,7 @@ function UpdateContact() {
             <>
                 <div style={{ display: "flex", alignItems: "center" }}>
                   <img
-                    src={c.image_url ? `${API}${c.image_url}` : `${API}/uploads/default.jpeg`}
+                    src={c.image_url ? `${c.image_url}` : `${DEFAULT_IMAGE_URL}`}
                     alt={c.name}
                     width="40"
                     height="40"
