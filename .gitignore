@@ -25,3 +25,5 @@ yarn-error.log*
 
 .for-docker.env
 instructions.txt
+
+.env
